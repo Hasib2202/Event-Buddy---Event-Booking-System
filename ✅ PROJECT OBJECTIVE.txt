@@ -1,0 +1,138 @@
+✅ PROJECT OBJECTIVE
+Build a Full Stack Event Booking System where:
+
+Users can browse and book event seats.
+
+Admins can manage events.
+
+The system must support authentication, authorization, booking logic, and be mobile responsive.
+
+✅ TASK LIST (FULL BREAKDOWN)
+🔷 PHASE 1: PROJECT SETUP
+🔹 1. Initialize the Project
+✅ Setup frontend (Next.js + Tailwind + TypeScript)
+
+✅ Setup backend (NestJS + PostgreSQL + TypeORM + TypeScript)
+
+✅ Configure .env files for both frontend and backend
+
+🔷 PHASE 2: DATABASE DESIGN & MODELS
+🔹 2. Define Entity Models (Backend)
+ User
+
+id, name, email, password, role (enum: admin | user)
+
+ Event
+
+id, title, description, date, time, location, totalSeats, availableSeats, image
+
+ Booking
+
+id, userId, eventId, numberOfSeats, bookingTime
+
+🔹 3. Define Relationships
+User ↔ Bookings (1-to-many)
+
+Event ↔ Bookings (1-to-many)
+
+Admin ↔ Events (admin can manage all)
+
+🔷 PHASE 3: AUTHENTICATION & AUTHORIZATION
+🔹 4. Implement Auth (JWT)
+ Register (User/Admin)
+
+ Login
+
+ Password hashing with bcrypt
+
+ Role-based guards: Admin vs User
+
+ Secure routes using JWT
+
+🔷 PHASE 4: BACKEND API IMPLEMENTATION
+🔹 5. User APIs
+ POST /auth/register
+
+ POST /auth/login
+
+ GET /user/bookings (for dashboard)
+
+🔹 6. Event APIs
+ GET /events (public: upcoming + past events)
+
+ GET /events/:id (event details)
+
+ POST /events (admin)
+
+ PATCH /events/:id (admin)
+
+ DELETE /events/:id (admin)
+
+🔹 7. Booking APIs
+ POST /bookings – book 1-4 seats
+
+ Booking validation:
+
+Not allowed for past events
+
+Cannot exceed available seats
+
+ GET /bookings/me – user dashboard
+
+🔷 PHASE 5: FRONTEND UI IMPLEMENTATION
+🔹 8. Public Pages (No login required)
+ Homepage
+
+ List of upcoming events
+
+ List of past events
+
+ Event Details Page
+
+ Show full event details
+
+ “Book Now” → redirects to login if not logged in
+
+🔹 9. Auth Pages
+ Login Page
+
+ Register Page
+
+🔹 10. User Dashboard (Logged in users)
+ View booked events
+
+ Booking form (1-4 seats)
+
+🔹 11. Admin Dashboard (Logged in admins)
+ List all events
+
+ Create new event
+
+ Edit event
+
+ Delete event
+
+🔷 PHASE 6: VALIDATION, STYLING, AND DEPLOYMENT
+🔹 12. Validation
+ Frontend form validation (React Hook Form / Zod)
+
+ Backend DTO validation using class-validator
+
+🔹 13. Styling
+ Use Tailwind CSS for all pages
+
+ Make fully responsive for mobile & desktop
+
+🔹 14. README & Instructions
+ Separate README.md for frontend and backend
+
+ Include setup steps, database config, run commands
+
+🔚 FINAL CHECKLIST (Submission Checklist from PDF)
+✅ Fully working frontend + backend
+✅ Mobile responsive UI
+✅ Functional JWT authentication
+✅ Booking logic with validation
+✅ Admin panel for event CRUD
+✅ README with full setup instructions
+
