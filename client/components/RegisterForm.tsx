@@ -1,7 +1,9 @@
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/router';
+import type { FieldError } from 'react-hook-form';
 
 interface RegisterFormData {
   name: string;
@@ -9,26 +11,114 @@ interface RegisterFormData {
   password: string;
 }
 
+// Response Type Definitions
+interface SuccessResponse {
+  message: string;
+}
+
+interface ValidationError {
+  message: string;
+  errors: {
+    [key: string]: string[];
+  };
+}
+
+interface ConflictError {
+  message: string;
+  error: string;
+  statusCode: number;
+}
+
+type ApiResponse = SuccessResponse | ValidationError | ConflictError;
+
+// Type Guards
+const isValidationError = (data: ApiResponse): data is ValidationError => {
+  return (data as ValidationError).errors !== undefined;
+};
+
+const isConflictError = (data: ApiResponse): data is ConflictError => {
+  return (data as ConflictError).statusCode === 409;
+};
+
+// Updated component
 export default function RegisterForm() {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setError,
   } = useForm<RegisterFormData>();
+
+  const router = useRouter();
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const res = await axios.post('http://localhost:3001/auth/register', data);
-      toast.success('Registration successful! You can now log in.');
-      console.log(res.data);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      const res = await axios.post<ApiResponse>('http://localhost:3001/auth/register', data, {
+        validateStatus: (status) => status < 500,
+      });
+
+      // Handle 409 Conflict (Email exists)
+      if (isConflictError(res.data)) {
+        setError('email', {
+          type: 'manual',
+          message: res.data.message,
+        });
+        return;
+      }
+
+      // Handle 400 Validation Errors
+      if (isValidationError(res.data)) {
+        Object.entries(res.data.errors).forEach(([field, messages]) => {
+          setError(field as keyof RegisterFormData, {
+            type: 'manual',
+            message: messages.join(' '),
+          });
+        });
+        return;
+      }
+
+      // Success case
+      if (res.status === 201) {
+        toast.success('Registration successful! Redirecting to login...');
+        setTimeout(() => router.push('/auth/login'), 2000);
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      
+      // Handle known error types
+      if (axiosError.response?.data) {
+        const errorData = axiosError.response.data;
+        
+        if (isConflictError(errorData)) {
+          setError('email', {
+            type: 'manual',
+            message: errorData.message,
+          });
+        } else if (isValidationError(errorData)) {
+          Object.entries(errorData.errors).forEach(([field, messages]) => {
+            setError(field as keyof RegisterFormData, {
+              type: 'manual',
+              message: messages.join(' '),
+            });
+          });
+        } else {
+          toast.error(errorData.message || 'Registration failed');
+        }
+      } else {
+        toast.error('Network error. Please try again.');
+      }
     }
   };
 
+  // ... rest of the component remains the same ...
+  const getInputClasses = (field: keyof RegisterFormData) => {
+    return `mt-1 block w-full px-3 py-2 border ${
+      errors[field] ? 'border-red-500' : 'border-gray-300'
+    } rounded-md shadow-sm focus:outline-none focus:ring focus:ring-purple-500 focus:border-purple-500 sm:text-sm`;
+  };
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-purple-50">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md px-4">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-purple-900 flex items-center justify-center">
             <span className="mr-2">
@@ -62,9 +152,15 @@ export default function RegisterForm() {
                 <input
                   id="name"
                   type="text"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  placeholder="enter your full name"
-                  {...register('name', { required: 'Name is required' })}
+                  className={getInputClasses('name')}
+                  placeholder="Enter your full name"
+                  {...register('name', { 
+                    required: 'Name is required',
+                    minLength: {
+                      value: 2,
+                      message: 'Name must be at least 2 characters',
+                    },
+                  })}
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -78,8 +174,8 @@ export default function RegisterForm() {
                 <input
                   id="email"
                   type="email"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  placeholder="enter your email"
+                  className={getInputClasses('email')}
+                  placeholder="Enter your email"
                   {...register('email', {
                     required: 'Email is required',
                     pattern: {
@@ -100,13 +196,17 @@ export default function RegisterForm() {
                 <input
                   id="password"
                   type="password"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  placeholder="enter your password"
+                  className={getInputClasses('password')}
+                  placeholder="Enter your password"
                   {...register('password', {
                     required: 'Password is required',
                     minLength: {
                       value: 6,
                       message: 'Password must be at least 6 characters',
+                    },
+                    validate: {
+                      hasNumber: value => /\d/.test(value) || 'Password needs at least 1 number',
+                      hasSpecial: value => /[!@#$%^&*]/.test(value) || 'Password needs at least 1 special character',
                     },
                   })}
                 />
@@ -120,9 +220,9 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
               >
-                {isSubmitting ? 'Registering...' : 'Sign Up'}
+                {isSubmitting ? 'Registering...' : 'Create Account'}
               </button>
             </div>
           </form>

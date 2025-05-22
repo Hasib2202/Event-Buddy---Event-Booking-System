@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AuthModule } from './auth/auth.module';
     EventsModule,
     BookingsModule,
     AuthModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

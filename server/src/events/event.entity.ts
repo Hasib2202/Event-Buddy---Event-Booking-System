@@ -1,5 +1,5 @@
 // src/events/event.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Booking } from '../bookings/booking.entity';
 
 @Entity()
@@ -13,11 +13,8 @@ export class Event {
   @Column({ type: 'text' })
   description: string;
 
-  @Column()
+  @Column({ type: 'timestamptz' })
   date: Date;
-
-  @Column()
-  time: string;
 
   @Column()
   location: string;
@@ -28,8 +25,11 @@ export class Event {
   @Column()
   availableSeats: number;
 
-  @Column({ nullable: true })
-  image: string;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany(() => Booking, booking => booking.event)
   bookings: Booking[];
