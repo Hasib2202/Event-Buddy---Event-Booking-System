@@ -4,6 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
+
 export default function Home() {
   const eventData = [
     {
@@ -128,7 +129,7 @@ export default function Home() {
           {/* Left Ticket */}
           <div className="absolute top-8 md:top-16 left-4 md:left-16 w-36 md:w-48 transform -rotate-12 opacity-90">
             <Image
-              src="/images/ticket-left.png"
+              src="/images/1.png"
               alt="One Way Ticket"
               width={200}
               height={100}
@@ -139,7 +140,7 @@ export default function Home() {
           {/* Right Ticket */}
           <div className="absolute top-16 md:top-24 right-4 md:right-16 w-36 md:w-48 transform rotate-6 opacity-90">
             <Image
-              src="/images/ticket-right.png"
+              src="/images/2.png"
               alt="One Way Ticket"
               width={200}
               height={100}
