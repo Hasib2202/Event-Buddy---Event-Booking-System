@@ -20,7 +20,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // async validate(payload: any) {
+  //   return { userId: payload.sub, email: payload.email, role: payload.role };
+  // }
+
+  // src/auth/jwt.strategy.ts
   async validate(payload: any) {
-    return { userId: payload.sub, email: payload.email, role: payload.role };
+    return {
+      id: payload.sub, // Make sure this matches your JWT signing
+      email: payload.email,
+      role: payload.role
+    };
   }
 }

@@ -6,7 +6,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 
 @Controller('bookings')
 export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+  constructor(private readonly bookingsService: BookingsService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -14,9 +14,17 @@ export class BookingsController {
     return this.bookingsService.create(createBookingDto, req.user);
   }
 
+  // @Get('me')
+  // @UseGuards(JwtAuthGuard)
+  // getMyBookings(@Req() req) {
+  //   return this.bookingsService.findUserBookings(req.user.id);
+  // }
+
+  // src/bookings/bookings.controller.ts
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getMyBookings(@Req() req) {
-    return this.bookingsService.findUserBookings(req.user.id);
+    // Use sub instead of id if needed
+    return this.bookingsService.findUserBookings(req.user.sub || req.user.id);
   }
 }

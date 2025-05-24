@@ -13,8 +13,11 @@ export class Event {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'timestamptz' })
-  date: Date;
+  @Column({ type: 'date' }) // Changed to store only date
+  eventDate: Date;
+
+  @Column({ type: 'time' }) // Added for time storage
+  eventTime: string;
 
   @Column()
   location: string;
@@ -25,11 +28,17 @@ export class Event {
   @Column()
   availableSeats: number;
 
+  @Column({ nullable: true }) // Added for image URL
+  eventImage: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  type: string;
 
   @OneToMany(() => Booking, booking => booking.event)
   bookings: Booking[];

@@ -43,7 +43,7 @@ export default function LoginForm() {
         "http://localhost:3001/auth/login",
         data,
         {
-          validateStatus: (status) => status < 500, // Handle 4xx errors in try block
+          validateStatus: (status) => status < 500,
         }
       );
 
@@ -91,28 +91,28 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-purple-50">
-      <div className="w-full max-w-md px-4">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-purple-900 flex items-center justify-center">
-            <span className="mr-2">
-              <svg
-                className="w-8 h-8"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect width="24" height="24" rx="4" fill="#4F46E5" />
-                <path
-                  d="M18 10C18 11.1 17.1 12 16 12C14.9 12 14 11.1 14 10C14 8.9 14.9 8 16 8C17.1 8 18 8.9 18 10ZM16 14C13.33 14 8 15.34 8 18V20H24V18C24 15.34 18.67 14 16 14ZM10 10C10 8.9 9.1 8 8 8C6.9 8 6 8.9 6 10C6 11.1 6.9 12 8 12C9.1 12 10 11.1 10 10ZM8 14C5.33 14 0 15.34 0 18V20H8V18C8 16.82 8.54 15.72 9.38 14.76C8.88 14.84 8.37 14.91 8 14.91Z"
-                  fill="white"
-                />
-              </svg>
-            </span>
-            Event buddy.
-          </h1>
-        </div>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-purple-50 relative">
+      {/* Top-left Logo */}
+      <div className="absolute top-4 left-4">
+        <Link href="/" className="flex items-center gap-2">
+          <svg
+            className="w-8 h-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="24" height="24" rx="4" fill="#4F46E5" />
+            <path
+              d="M18 10C18 11.1 17.1 12 16 12C14.9 12 14 11.1 14 10C14 8.9 14.9 8 16 8C17.1 8 18 8.9 18 10ZM16 14C13.33 14 8 15.34 8 18V20H24V18C24 15.34 18.67 14 16 14ZM10 10C10 8.9 9.1 8 8 8C6.9 8 6 8.9 6 10C6 11.1 6.9 12 8 12C9.1 12 10 11.1 10 10ZM8 14C5.33 14 0 15.34 0 18V20H8V18C8 16.82 8.54 15.72 9.38 14.76C8.88 14.84 8.37 14.91 8 14.91Z"
+              fill="white"
+            />
+          </svg>
+          <span className="text-2xl font-bold text-purple-900">Event buddy.</span>
+        </Link>
+      </div>
 
+      {/* Login Form */}
+      <div className="w-full max-w-md px-4">
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">Sign in</h2>
           <p className="text-sm text-gray-600 mb-6">

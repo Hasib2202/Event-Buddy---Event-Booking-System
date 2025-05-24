@@ -11,6 +11,7 @@ interface Event {
   date: string;
   location: string;
   registrations: number;
+  totalCapacity: number;
 }
 
 export default function AdminDashboard() {
@@ -51,6 +52,16 @@ export default function AdminDashboard() {
     router.push("/auth/login");
   };
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -73,76 +84,82 @@ export default function AdminDashboard() {
             </span>
             Event buddy.
           </h1>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-purple-600 hover:text-purple-800"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-600">Hello, Admin</span>
+            <button
+              onClick={handleLogout}
+              className="text-sm text-purple-600 hover:text-purple-800"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Admin Dashboard
-          </h2>
-          <p className="text-gray-600 mb-8">
-            Manage events, view registrations, and monitor your platform.
-          </p>
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Admin Dashboard
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Manage events, view registrations, and monitor your platform.
+            </p>
+          </div>
 
           {/* Events Management */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Events Management
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                Events Management
+              </h3>
+              <Link
+                href="/admin/events/create"
+                className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Create Event
+              </Link>
+            </div>
+
             {loading ? (
               <p>Loading events...</p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto border rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Title
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Registrations
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
+                      {['Title', 'Date', 'Location', 'Registrations', 'Actions'].map((header) => (
+                        <th
+                          key={header}
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          {header}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {events.map((event) => (
                       <tr key={event.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
                           {event.title}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {event.date}
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {formatDate(event.date)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500">
                           {event.location}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {event.registrations}
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {event.registrations}/{event.totalCapacity}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <button className="text-purple-600 hover:text-purple-900 mr-4">
-                            Edit
-                          </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            Delete
-                          </button>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          <div className="flex gap-3">
+                            <button className="hover:text-purple-600">💷</button>
+                            <button className="hover:text-purple-600">💸</button>
+                            <button className="hover:text-purple-600">💹</button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -154,30 +171,6 @@ export default function AdminDashboard() {
         </div>
       </main>
 
-      {/* Footer */}
-      {/* <footer className="bg-white border-t border-gray-200 mt-8">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex space-x-6">
-              <Link href="/" className="text-gray-500 hover:text-gray-700">
-                Home
-              </Link>
-              <Link href="/auth/login" className="text-gray-500 hover:text-gray-700">
-                Sign-in
-              </Link>
-              <Link href="/auth/register" className="text-gray-500 hover:text-gray-700">
-                Sign-up
-              </Link>
-              <Link href="#" className="text-gray-500 hover:text-gray-700">
-                Privacy Policy
-              </Link>
-            </div>
-            <p className="mt-4 md:mt-0 text-sm text-gray-500">
-              © 2025 Eventbuddy. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer> */}
       <Footer />
     </div>
   );

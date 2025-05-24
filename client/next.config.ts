@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+// next.config.js
+const nextConfig = {
+  images: {
+    unoptimized: true, // Disables image optimization globally - allows any image URL
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig

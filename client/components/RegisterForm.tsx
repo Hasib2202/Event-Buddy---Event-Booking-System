@@ -1,9 +1,9 @@
+// components/RegisterForm.tsx
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import type { FieldError } from 'react-hook-form';
 
 interface RegisterFormData {
   name: string;
@@ -11,7 +11,6 @@ interface RegisterFormData {
   password: string;
 }
 
-// Response Type Definitions
 interface SuccessResponse {
   message: string;
 }
@@ -31,7 +30,6 @@ interface ConflictError {
 
 type ApiResponse = SuccessResponse | ValidationError | ConflictError;
 
-// Type Guards
 const isValidationError = (data: ApiResponse): data is ValidationError => {
   return (data as ValidationError).errors !== undefined;
 };
@@ -40,7 +38,6 @@ const isConflictError = (data: ApiResponse): data is ConflictError => {
   return (data as ConflictError).statusCode === 409;
 };
 
-// Updated component
 export default function RegisterForm() {
   const {
     register,
@@ -57,7 +54,6 @@ export default function RegisterForm() {
         validateStatus: (status) => status < 500,
       });
 
-      // Handle 409 Conflict (Email exists)
       if (isConflictError(res.data)) {
         setError('email', {
           type: 'manual',
@@ -66,7 +62,6 @@ export default function RegisterForm() {
         return;
       }
 
-      // Handle 400 Validation Errors
       if (isValidationError(res.data)) {
         Object.entries(res.data.errors).forEach(([field, messages]) => {
           setError(field as keyof RegisterFormData, {
@@ -77,7 +72,6 @@ export default function RegisterForm() {
         return;
       }
 
-      // Success case
       if (res.status === 201) {
         toast.success('Registration successful! Redirecting to login...');
         setTimeout(() => router.push('/auth/login'), 2000);
@@ -85,7 +79,6 @@ export default function RegisterForm() {
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ApiResponse>;
       
-      // Handle known error types
       if (axiosError.response?.data) {
         const errorData = axiosError.response.data;
         
@@ -110,34 +103,42 @@ export default function RegisterForm() {
     }
   };
 
-  // ... rest of the component remains the same ...
   const getInputClasses = (field: keyof RegisterFormData) => {
     return `mt-1 block w-full px-3 py-2 border ${
       errors[field] ? 'border-red-500' : 'border-gray-300'
     } rounded-md shadow-sm focus:outline-none focus:ring focus:ring-purple-500 focus:border-purple-500 sm:text-sm`;
   };
-  return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-purple-50">
-      <div className="w-full max-w-md px-4">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-purple-900 flex items-center justify-center">
-            <span className="mr-2">
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="4" fill="#4F46E5" />
-                <path d="M18 10C18 11.1 17.1 12 16 12C14.9 12 14 11.1 14 10C14 8.9 14.9 8 16 8C17.1 8 18 8.9 18 10ZM16 14C13.33 14 8 15.34 8 18V20H24V18C24 15.34 18.67 14 16 14ZM10 10C10 8.9 9.1 8 8 8C6.9 8 6 8.9 6 10C6 11.1 6.9 12 8 12C9.1 12 10 11.1 10 10ZM8 14C5.33 14 0 15.34 0 18V20H8V18C8 16.82 8.54 15.72 9.38 14.76C8.88 14.84 8.37 14.91 8 14.91Z" fill="white" />
-              </svg>
-            </span>
-            Event buddy.
-          </h1>
-        </div>
 
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-purple-50 relative">
+      {/* Top-left Logo */}
+      <div className="absolute top-4 left-4">
+        <Link href="/" className="flex items-center gap-2">
+          <svg
+            className="w-8 h-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="24" height="24" rx="4" fill="#4F46E5" />
+            <path
+              d="M18 10C18 11.1 17.1 12 16 12C14.9 12 14 11.1 14 10C14 8.9 14.9 8 16 8C17.1 8 18 8.9 18 10ZM16 14C13.33 14 8 15.34 8 18V20H24V18C24 15.34 18.67 14 16 14ZM10 10C10 8.9 9.1 8 8 8C6.9 8 6 8.9 6 10C6 11.1 6.9 12 8 12C9.1 12 10 11.1 10 10ZM8 14C5.33 14 0 15.34 0 18V20H8V18C8 16.82 8.54 15.72 9.38 14.76C8.88 14.84 8.37 14.91 8 14.91Z"
+              fill="white"
+            />
+          </svg>
+          <span className="text-2xl font-bold text-purple-900">Event buddy.</span>
+        </Link>
+      </div>
+
+      {/* Registration Form */}
+      <div className="w-full max-w-md px-4">
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">Create an account</h2>
           <p className="text-sm text-gray-600 mb-6">
             Already have an account?{' '}
             <Link 
               href="/auth/login" 
-              className="font-medium text-purple-600 hover:text-purple-500"
+              className="font-medium text-purple-600 hover:text-purple-500 transition-colors"
             >
               Login here
             </Link>
