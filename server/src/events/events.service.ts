@@ -17,6 +17,18 @@ export class EventsService {
     return this.eventRepository.find();
   }
 
+  async findAllEventsWithBookings() {
+    const events = await this.eventRepository.find({
+      relations: ['bookings'],
+      order: { createdAt: 'DESC' }
+    });
+    
+    return events.map(event => ({
+      ...event,
+      bookedSeats: event.bookings.reduce((sum, booking) => sum + booking.seats, 0)
+    }));
+  }
+
   async findOne(id: number): Promise<Event> {
     const event = await this.eventRepository.findOne({ where: { id } });
     if (!event) {

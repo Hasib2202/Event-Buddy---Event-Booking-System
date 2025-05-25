@@ -13,9 +13,13 @@ export class AuthController {
     return this.authService.register(name, email, password);
   }
 
-  @Post('login')
-  login(@Body() body: LoginDto) {
+   @Post('login')
+  async login(@Body() body: LoginDto) {
     const { email, password } = body;
-    return this.authService.login(email, password);
+    const result = await this.authService.login(email, password);
+    return {
+      token: result.access_token,
+      user: result.user
+    };
   }
 }

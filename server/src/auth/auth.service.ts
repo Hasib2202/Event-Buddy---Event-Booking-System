@@ -31,14 +31,25 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.usersRepo.findOne({ where: { email } });
+    const user = await this.usersRepo.findOne({ 
+      where: { email },
+      select: ['id', 'name', 'email', 'password', 'role'] // Include needed fields
+    });
+    
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    // Remove password before returning
+    const { password: _, ...userWithoutPassword } = user;
+    
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign({
+        sub: user.id,
+        email: user.email,
+        role: user.role
+      }),
+      user: userWithoutPassword
     };
   }
 }
