@@ -246,7 +246,7 @@ Thanks to the contributors, open-source packages, and frameworks that made this 
 
 For any questions or suggestions, feel free to reach out:
 
-* 💼 LinkedIn: [Md. Mostofa Hasib] ([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/md-mostofa-hasib-5b4027184/))
+* 💼 LinkedIn: [Md. Mostofa Hasib] ((https://www.linkedin.com/in/md-mostofa-hasib-5b4027184/))
 * 📧 Email: (hasibammostofahasib@gmail.com)
 
 ---
