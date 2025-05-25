@@ -30,26 +30,32 @@ export class AuthService {
     return this.usersRepo.save(newUser);
   }
 
+  // src/auth/auth.service.ts
   async login(email: string, password: string) {
-    const user = await this.usersRepo.findOne({ 
+    const user = await this.usersRepo.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'password', 'role'] // Include needed fields
+      select: ['id', 'name', 'email', 'password', 'role'] // Ensure 'name' is selected
     });
-    
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Remove password before returning
-    const { password: _, ...userWithoutPassword } = user;
-    
+    // Explicitly include the name field
+    const { password: _, ...userData } = user;
+
     return {
       access_token: this.jwtService.sign({
         sub: user.id,
         email: user.email,
         role: user.role
       }),
-      user: userWithoutPassword
+      user: {
+        id: user.id,
+        name: user.name, // Explicitly return name
+        email: user.email,
+        role: user.role
+      }
     };
   }
 }

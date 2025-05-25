@@ -4,17 +4,10 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
-import { jwtDecode } from "jwt-decode";
 
 interface LoginFormData {
   email: string;
   password: string;
-}
-
-interface JwtPayload {
-  sub: string;
-  email: string;
-  role: string;
 }
 
 interface ApiError {
@@ -34,58 +27,47 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
     setError,
   } = useForm<LoginFormData>();
-
   const router = useRouter();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await axios.post<{ access_token: string }>(
+      const res = await axios.post<{
+        access_token: string;
+        user: { id: string; name: string; email: string; role: string };
+      }>(
         "http://localhost:3001/auth/login",
         data,
-        {
-          validateStatus: (status) => status < 500,
-        }
+        { validateStatus: (status) => status < 500 }
       );
 
       if (res.status === 401) {
-        throw { 
-          response: { 
+        throw {
+          response: {
             data: { message: "Invalid email or password" },
-            status: 401
-          } 
+            status: 401,
+          },
         };
       }
-
       if (res.status >= 400) {
         throw new Error("An unexpected error occurred");
       }
 
       toast.success("Login successful!");
-      
-      const { access_token } = res.data;
-      const decoded = jwtDecode<JwtPayload>(access_token);
 
+      const { access_token, user } = res.data;
       localStorage.setItem("token", access_token);
-      localStorage.setItem("user", JSON.stringify({
-        id: decoded.sub,
-        email: decoded.email,
-        role: decoded.role
-      }));
+      localStorage.setItem("user", JSON.stringify(user));
 
-      router.push(decoded.role === "admin" ? "/dashboard/admin" : "/dashboard/user");
+      router.push(user.role === "admin" ? "/dashboard/admin" : "/dashboard/user");
     } catch (err) {
       const error = err as ApiError;
-      
       console.error("Login error:", error);
-      
-      const errorMessage = error.response?.data?.message 
-        || error.message 
-        || "Login failed. Please try again.";
 
+      const errorMessage =
+        error.response?.data?.message || error.message || "Login failed. Please try again.";
       if (error.response?.status === 401) {
         setError("root", { type: "manual", message: errorMessage });
       }
-
       toast.error(errorMessage);
     }
   };
@@ -125,11 +107,7 @@ export default function LoginForm() {
             </Link>
           </p>
 
-          <form
-            className="space-y-6"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="space-y-4">
               <div>
                 <label
@@ -154,9 +132,7 @@ export default function LoginForm() {
                   })}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
                 )}
               </div>
 
@@ -191,9 +167,7 @@ export default function LoginForm() {
             </div>
 
             {errors.root && (
-              <p className="text-sm text-red-600 text-center">
-                {errors.root.message}
-              </p>
+              <p className="text-sm text-red-600 text-center">{errors.root.message}</p>
             )}
 
             <div>

@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import Footer from "@/components/Footer";
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from "lucide-react";
 
 interface Event {
   id: number;
@@ -21,38 +21,46 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState<string>("Admin");
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/auth/login");
-          return;
-        }
-
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        setUserName(user.name || "Admin");
-
-        const response = await axios.get<Event[]>(
-          "http://localhost:3001/admin/events",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setEvents(response.data);
-      } catch (error) {
-        toast.error("Failed to fetch events");
-        console.error(error);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchEvents = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/auth/login");
+        return;
       }
-    };
 
-    fetchEvents();
-  }, [router]);
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      
+      if (user.role !== "admin") {
+        toast.error("Access denied: Admins only");
+        router.push("/unauthorized"); // or redirect to home
+        return;
+      }
+
+      setUserName(user.name || "Admin");
+
+      const response = await axios.get<Event[]>(
+        "http://localhost:3001/admin/events",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEvents(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch events");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchEvents();
+}, [router]);
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -103,7 +111,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={handleLogout}
-              className="bg-[linear-gradient(to_right,#7B8BFF,#4157FE)] hover:bg-[linear-gradient(to_right,#6A7AFF,#3046ED)] transition duration-200 px-4 py-2 rounded-md text-sm font-medium flex items-center text-white transition-colors"
+              className="bg-[linear-gradient(to_right,#7B8BFF,#4157FE)] hover:bg-[linear-gradient(to_right,#6A7AFF,#3046ED)] transition duration-200 px-4 py-2 rounded-md text-sm font-medium flex items-center text-white"
             >
               <svg
                 className="w-5 h-5 mr-2"
