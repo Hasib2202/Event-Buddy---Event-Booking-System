@@ -206,8 +206,6 @@ Here’s a preview of the **Event Booking System**:
 ### 🔒 Register Page
 ![Image](https://github.com/user-attachments/assets/1a4e590f-7da2-4ba7-8a80-38b893c7bfe2)
 
-### 🏠 Home Page (Upcoming Events)
-![Home Page](https://github.com/your-username/event-booking-system/blob/main/assets/screenshots/home.png?raw=true)
 
 ### 📅 Event Details Page
 ![Image](https://github.com/user-attachments/assets/6f2be336-217f-49b8-a42b-d8b017376eda)
