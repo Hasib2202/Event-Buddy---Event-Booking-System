@@ -72,14 +72,6 @@ export class BookingsService {
       return booking;
     });
   }
-
-  // findUserBookings(userId: number): Promise<Booking[]> {
-  //   return this.bookingRepository.find({
-  //     where: { user: { id: userId } },
-  //     relations: ['event', 'user'],
-  //     order: { bookingDate: 'DESC' }
-  //   });
-  // }
   // src/bookings/bookings.service.ts
   findUserBookings(userId: number): Promise<Booking[]> {
     return this.bookingRepository.find({
@@ -90,4 +82,27 @@ export class BookingsService {
       order: { bookingDate: 'DESC' }
     });
   }
+
+  // src/bookings/bookings.service.ts
+  async removeUserBooking(id: number, userId: number): Promise<void> {
+    return this.dataSource.transaction(async manager => {
+      const booking = await manager.findOne(Booking, {
+        where: { id: id, user: { id: userId } },
+        relations: ['event']
+      });
+
+      if (!booking) {
+        throw new NotFoundException('Booking not found or not owned by user');
+      }
+
+      // Restore seats to the event
+      await manager.update(Event, booking.event.id, {
+        availableSeats: () => `availableSeats + ${booking.seats}`
+      });
+
+      await manager.delete(Booking, id);
+    });
+  }
+
+
 }

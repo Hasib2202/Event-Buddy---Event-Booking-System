@@ -360,7 +360,6 @@ export default function EventDetails() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <Toaster position="top-center" reverseOrder={false} />
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
@@ -604,6 +603,26 @@ export default function EventDetails() {
           </div>
         </div>
       </main>
+
+       {/* Toast Notifications */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          success: {
+            style: {
+              background: "green",
+              color: "white",
+            },
+          },
+          error: {
+            style: {
+              background: "red",
+              color: "white",
+            },
+          },
+        }}
+      />
 
       <Footer />
     </div>

@@ -87,8 +87,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
           </span>
         </div>
         <h3 className="text-xl font-bold text-gray-800 mb-2">{event.title}</h3>
-        <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-          {event.description}
+        <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-2">
+          {event.description
+            .split("\n")
+            .find((line) => line.trim().length > 0) ||
+            "No description available"}
         </p>
 
         {/* Date/Time/Location Section */}
@@ -281,7 +284,6 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-
         {/* Hero Section */}
         <section className="relative overflow-hidden py-20 md:py-32 lg:py-40 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-[400px]">
           {/* Background Elements */}
@@ -428,7 +430,6 @@ export default function Home() {
           </div>
         </section>
 
-        
         <Footer />
       </div>
     </>
