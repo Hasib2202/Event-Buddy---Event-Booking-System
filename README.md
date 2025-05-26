@@ -198,7 +198,7 @@ npm run dev
 Here’s a preview of the **Event Booking System**:
 
 ### 🚀 Landing Page (Homepage)
-![Image](https://github.com/user-attachments/assets/f8e548b3-39f8-4de2-bc40-0e2a8fad3529)
+![Image](https://github.com/user-attachments/assets/68ad2980-94a8-456b-bd6e-c64795c21550)
 
 ### 🔒 Login Page
 ![Image](https://github.com/user-attachments/assets/6d89a980-7aaa-4b02-bacb-63eb8878b2c6)
