@@ -28,6 +28,79 @@ interface EventCardProps {
   isPast?: boolean;
 }
 
+// Pagination Component
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
+  const getVisiblePages = () => {
+    const pages = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(
+          1,
+          "...",
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+
+    return pages;
+  };
+
+  return (
+    <div className="flex justify-center items-center space-x-2 mt-8">
+      {getVisiblePages().map((page, index) => (
+        <button
+          key={index}
+          onClick={() => typeof page === "number" && onPageChange(page)}
+          disabled={page === "..."}
+          className={`
+            w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors
+            ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : page === "..."
+                ? "text-gray-400 cursor-default"
+                : "text-gray-600 hover:bg-gray-100"
+            }
+          `}
+        >
+          {page}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
   const router = useRouter();
 
@@ -58,8 +131,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col cursor-pointer transform hover:scale-105 transition-transform"
+      className="bg-white shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer transform hover:scale-105 relative"
       onClick={handleCardClick}
+      style={{
+        clipPath:
+          "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+      }}
     >
       <div className="relative w-full h-48 sm:h-56 lg:h-48 xl:h-56">
         <Image
@@ -67,7 +144,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
           alt={event.title}
           layout="fill"
           objectFit="cover"
-          className="rounded-t-xl"
         />
         {isPast && (
           <div className="absolute top-3 right-3">
@@ -77,6 +153,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
           </div>
         )}
       </div>
+
       <div className="p-5 flex-grow">
         <div className="text-xs font-semibold text-blue-600 mb-2 flex items-baseline">
           <span className="text-gray-500 mr-1">
@@ -95,7 +172,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
         </p>
 
         {/* Date/Time/Location Section */}
-        <div className="flex items-center text-gray-500 text-sm mb-4 gap-4">
+        <div className="flex items-center text-gray-500 text-sm mb-4 gap-4 flex-wrap">
           {/* Date */}
           <div className="flex items-center">
             <svg
@@ -115,7 +192,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>{formatEventDate(event.eventDate).weekday}</span>
+            <span className="text-xs">
+              {formatEventDate(event.eventDate).weekday}
+            </span>
           </div>
 
           {/* Time */}
@@ -135,7 +214,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <span>{formatTime(event.eventTime)}</span>
+            <span className="text-xs">{formatTime(event.eventTime)}</span>
           </div>
 
           {/* Location */}
@@ -155,11 +234,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <span>{event.location}</span>
+            <span className="text-xs">{event.location}</span>
           </div>
         </div>
 
-        {/* Rest of the component remains the same */}
+        {/* Event Type */}
         <div className="flex flex-wrap gap-2 mb-4">
           <span
             className={`text-xs px-3 py-1 rounded-full font-medium ${
@@ -169,6 +248,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
             {event.type}
           </span>
         </div>
+
+        {/* Seats Info */}
         <div className="flex justify-between items-center text-sm text-gray-600 border-t pt-4 mt-auto">
           <div className="flex items-center">
             <svg
@@ -189,7 +270,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
                 <path d="M6 10 H18 V14 H6 Z M6 14 L6 18 M18 14 L18 18" />
               )}
             </svg>
-            <span>
+            <span className="text-xs">
               {isPast
                 ? `${event.totalSeats - event.availableSeats} Attended`
                 : `${event.availableSeats} Seats Left`}
@@ -210,19 +291,26 @@ const EventCard: React.FC<EventCardProps> = ({ event, isPast = false }) => {
             >
               <path d="M6 10 H18 V14 H6 Z M6 14 L6 18 M18 14 L18 18" />
             </svg>
-            <span>Total {event.totalSeats} Seats</span>
+            <span className="text-xs">Total {event.totalSeats} Seats</span>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Event[]>([]);
+
+  // Pagination states
+  const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
+  const [pastCurrentPage, setPastCurrentPage] = useState(1);
+  const UPCOMING_EVENTS_PER_PAGE = 6;
+  const PAST_EVENTS_PER_PAGE = 3;
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -254,6 +342,22 @@ export default function Home() {
     const eventDateTime = new Date(`${event.eventDate}T${event.eventTime}`);
     return eventDateTime < new Date();
   });
+
+  // Pagination calculations
+  const upcomingTotalPages = Math.ceil(
+    upcomingEvents.length / UPCOMING_EVENTS_PER_PAGE
+  );
+  const pastTotalPages = Math.ceil(pastEvents.length / PAST_EVENTS_PER_PAGE);
+
+  const paginatedUpcomingEvents = upcomingEvents.slice(
+    (upcomingCurrentPage - 1) * UPCOMING_EVENTS_PER_PAGE,
+    upcomingCurrentPage * UPCOMING_EVENTS_PER_PAGE
+  );
+
+  const paginatedPastEvents = pastEvents.slice(
+    (pastCurrentPage - 1) * PAST_EVENTS_PER_PAGE,
+    pastCurrentPage * PAST_EVENTS_PER_PAGE
+  );
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -383,8 +487,6 @@ export default function Home() {
             Upcoming Events
           </h2>
 
-          {/* Loading and error states - No changes here */}
-          {/* ... */}
           {loading && (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -411,10 +513,19 @@ export default function Home() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-            {upcomingEvents.map((event) => (
+            {paginatedUpcomingEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
+
+          {/* Upcoming Events Pagination */}
+          {upcomingTotalPages > 1 && (
+            <Pagination
+              currentPage={upcomingCurrentPage}
+              totalPages={upcomingTotalPages}
+              onPageChange={setUpcomingCurrentPage}
+            />
+          )}
         </section>
 
         {/* Past Events Section */}
@@ -424,10 +535,19 @@ export default function Home() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-            {pastEvents.map((event) => (
+            {paginatedPastEvents.map((event) => (
               <EventCard key={event.id} event={event} isPast={true} />
             ))}
           </div>
+
+          {/* Past Events Pagination */}
+          {pastTotalPages > 1 && (
+            <Pagination
+              currentPage={pastCurrentPage}
+              totalPages={pastTotalPages}
+              onPageChange={setPastCurrentPage}
+            />
+          )}
         </section>
 
         <Footer />

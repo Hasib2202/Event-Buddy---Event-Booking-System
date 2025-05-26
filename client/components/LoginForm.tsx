@@ -94,7 +94,12 @@ export default function LoginForm() {
       </div>
 
       {/* Login Form */}
-      <div className="w-full max-w-md px-4">
+      <div className="w-full max-w-md px-4 shadow-lg"
+      style={{
+        clipPath:
+          "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+      }}
+      >
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">Sign in</h2>
           <p className="text-sm text-gray-600 mb-6">
